@@ -386,7 +386,7 @@ setMethod("show",
             output.table <- data.frame(matrix(Value, nrow = length(object@Exposure)))
             colnames(output.table) <- Statistic
             
-            cat("\nMultivariable Median Based method \n")
+            cat("\nMultivariable median based method \n")
             cat("(", object@Model, "-effect model) \n \n", sep = "")
             
             cat("Number of variants :", object@SNPs, "\n")
@@ -395,7 +395,7 @@ setMethod("show",
             print(output.table, quote = F, row.names = FALSE, justify = "left")
             cat("------------------------------------------------------------------\n")
             
-            cat("Residual standard error = ", decimals(object@RSE, 3), "\n")
+            cat("(TODO) Residual standard error = ", decimals(object@RSE, 3), "\n")
             
           }
          )
