@@ -7,7 +7,7 @@ setMethod("mr_forest",
           function(object,
                    alpha = 0.05,
                    snp_estimates = TRUE,
-                   method = "default",
+                   methods = "ivw",
                    ordered = FALSE){
             
             
@@ -43,32 +43,104 @@ setMethod("mr_forest",
               names(df) = c("snps", "estimates", "CI_lower", "CI_upper")
             }
             
+            #Calculate and implement the rows.
             
-
+            #Define a data frame to contain the outputs of the various methods
+            calculated = data.frame(matrix(ncol = 4, nrow = 0))
+            names(calculated) = c("snps", "estimates", "CI_lower", "CI_upper")
+            #IVW Method
+            if ("ivw" %in% methods) {
+              ivw_output = mr_ivw(mr_input(Bx,Bxse,By,Byse), alpha = alpha)
+              ivw_estimate = ivw_output$Estimate
+              ivw_CI_lower = ivw_output$CILower
+              ivw_CI_upper = ivw_output$CIUpper
+              
+              ivw_row = data.frame("IVW Estimate", ivw_estimate, ivw_CI_lower, ivw_CI_upper)
+              names(ivw_row) = names(df)
+              calculated = rbind(calculated, ivw_row)
+            }
+            #Median Method
+            if ("median" %in% methods) {
+              median_output = mr_median(mr_input(Bx, Bxse, By, Byse), weighting="simple")
+              median_estimate = median_output$Estimate
+              median_CI_lower = median_output$CILower
+              median_CI_upper = median_output$CIUpper
+              
+              median_row = data.frame("Simple median estimate", median_estimate, median_CI_lower, median_CI_upper)
+              names(median_row) = names(df)
+              calculated = rbind(calculated, median_row)
+            } 
+            if("wmedian" %in% methods) {
+              wmedian_output = mr_median(mr_input(Bx, Bxse,Bby, Byse), weighting="weighted")
+              wmedian_estimate = wmedian_output$Estimate
+              wmedian_CI_lower = wmedian_output$CILower
+              wmedian_CI_upper = wmedian_output$CIUpper
+              
+              wmedian_row = data.frame("Weighted median estimate", wmedian_estimate, wmedian_CI_lower, wmedian_CI_upper)
+              names(wmedian_row) = names(df)
+              calculated = rbind(calculated, wmedian_row)
+            } 
+            if ("egger" %in% methods) {
+              egger_output = mr_egger(mr_input(Bx, Bxse, By, Byse))
+              egger_estimate = egger_output$Estimate
+              egger_CI_lower = egger_output$CILower.Est
+              egger_CI_upper = egger_output$CIUpper.Est
+              
+              egger_row = data.frame("MR-Egger estimate", egger_estimate, egger_CI_lower, egger_CI_upper)
+              names(egger_row) = names(df)
+              calculated = rbind(calculated, egger_row)
+            } 
+            if ("maxlik" %in% methods) {
+              maxlik_output = mr_maxlik(mr_input(Bx, Bxse, By, Byse))
+              maxlik_estimate = maxlik_output$Estimate
+              maxlik_CI_lower = maxlik_output$CILower
+              maxlik_CI_upper = maxlik_output$CIUpper
+              
+              maxlik_row = data.frame("Maximum likelihood estimate", maxlik_estimate, maxlik_CI_lower, maxlik_CI_upper)
+              names(maxlik_row) = names(df)
+              calculated = rbind(calculated, maxlik_row)
+            } 
+            if ("mbe" %in% methods) {
+              mbe_output = mr_mbe(mr_input(Bx, Bxse, By, Byse))
+              mbe_estimate = mbe_output$Estimate
+              mbe_CI_lower = mbe_output$CILower
+              mbe_CI_upper = mbe_output$CIUpper
+              
+              mbe_row = data.frame("Mode-based estimate", mbe_estimate, mbe_CI_lower, mbe_CI_upper)
+              names(mbe_row) = names(df)
+              calculated = rbind(calculated, mbe_row)
+            } 
+            if ("conmix" %in% methods) {
+              conmix_output = mr_conmix(mr_input(Bx, Bxse, By, Byse))
+              conmix_estimate = conmix_output$Estimate
+              conmix_CI_lower = conmix_output$CILower
+              conmix_CI_upper = conmix_output$CIUpper
+              
+              conmix_row = data.frame("Contamination mixture estimate", conmix_estimate, conmix_CI_lower, conmix_CI_upper)
+              names(conmix_row) = names(df)
+              calculated = rbind(calculated, conmix_row)
+            }
             
-            
-            ivw_output = mr_ivw(mr_input(Bx,Bxse,By,Byse), alpha = alpha)
-            ivw_estimate = ivw_output$Estimate
-            ivw_CI_lower = ivw_output$CILower
-            ivw_CI_upper = ivw_output$CIUpper
-            
-            ivw_row = data.frame("IVW Estimate", ivw_estimate, ivw_CI_lower, ivw_CI_upper)
-            names(ivw_row) = names(df)
-            
-            
+            #Deal with ordered
+            #This is really nasty for some reason to do with how ggplot likes to allow you to order things
+            #Also need to reorder factors backwards as plotting x,y flipped
             if (ordered == TRUE){
+              #This works
+              #The idea is that we first order the estimates, then reverse the order
+              #Then add the calculated ones to the beginning which is actually the end
               factor_order = rev(df$snps[order(df$estimates)])
               df$snps = factor(df$snps, levels = factor_order)
-              df = rbind(df, ivw_row)
-              df$snps = factor(df$snps, levels= c("IVW Estimate", factor_order))
+              df = rbind(df, calculated)
+              df$snps = factor(df$snps, levels= c(calculated$snps, factor_order))
             } else{
-              df = rbind(df, ivw_row)
+              #This works simply on the merit that these need to be reversed
+              df = rbind(df, calculated)
               df$snps = factor(df$snps, rev(df$snps))
             }
             
             forest <- ggplot(data = df, aes(y=snps, x=estimates, xmin=CI_lower, xmax = CI_upper)) +
               geom_point(shape = 15) +
-              geom_point(data = ivw_row, aes(y=snps, x = estimates), shape = 18, size = 3) +
+              geom_point(data = calculated, aes(y=snps, x = estimates), shape = 18, size = 3) +
               geom_linerange() +
               geom_vline(xintercept = 0, lty= 2) +
               ylab("Variants") + xlab(Y_label) +

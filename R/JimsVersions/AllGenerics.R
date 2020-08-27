@@ -305,7 +305,7 @@ setGeneric(name = "mr_plot",
 #' @param object An \code{MRInput} object.
 #' @param alpha Determines the size of the CI to be drawn
 #' @param snp_estimates Whether to plot the snp estimates
-#' @param method For pass-through to IVW.
+#' @param methods Takes a string of computation methods used to calculate estimates.
 #' @param ordered Determines by whether to order by the estimates. Defaults to FALSE
 #'
 #' @details As is produces as \code{ggplot} plot of forest plot.
@@ -317,7 +317,7 @@ setGeneric(name = "mr_plot",
 #' @export
 
 setGeneric(name = "mr_forest",
-           def = function(object, alpha = 0.05, snp_estimates = TRUE, method = "default", ordered = FALSE){standardGeneric("mr_forest")})
+           def = function(object, alpha = 0.05, snp_estimates = TRUE, methods = "ivw", ordered = FALSE){standardGeneric("mr_forest")})
 
 #--------------------------------------------------------------------------------------------
 
