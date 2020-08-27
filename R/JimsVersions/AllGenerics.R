@@ -1,6 +1,7 @@
 #Jim's version of AllGenerics.R
 #Create a Generic for mr_mvmedian
-
+#Create a Generic for mr_forest
+#Create a Generic for mr_loo
 
 # This is an internal function
 setGeneric(name = "values",
@@ -293,6 +294,49 @@ setGeneric(name = "mr_allmethods",
 
 setGeneric(name = "mr_plot",
            def = function(object, error = TRUE, line = "ivw", orientate=FALSE, interactive = TRUE, labels = FALSE){standardGeneric("mr_plot")})
+
+
+#--------------------------------------------------------------------------------------------
+
+#' Draw a forest plot of the genetic associations and/or causal estimates
+#'
+#' 
+#'
+#' @param object An \code{MRInput} object.
+#' @param alpha Determines the size of the CI to be drawn
+#' @param method For pass-through to IVW.
+#' @param ordered Determines by whether to order by the estimates. Defaults to FALSE
+#'
+#' @details As is produces as \code{ggplot} plot of forest plot.
+#' Includes an IVW estimate which is distinguished from all other variants
+#'
+#' @examples mr_forest(mr_input(bx = ldlc, bxse = ldlcse, by = chdlodds, byse = chdloddsse),
+#'   alpha = 0.01, ordered = TRUE)
+#'
+#' @export
+
+setGeneric(name = "mr_forest",
+           def = function(object, alpha = 0.05, method = "default", ordered = FALSE){standardGeneric("mr_forest")})
+
+#--------------------------------------------------------------------------------------------
+
+#' Draw a forest plot of the genetic associations and/or causal estimates
+#'
+#' 
+#'
+#' @param object An \code{MRInput} object.
+#' @param alpha Determines the size of the CI to be drawn
+#'
+#' @details As is produces as \code{ggplot} plot of forest plot. The method looks at the estimate formed by excluding each variant and then plot as a forest plot akin to \code{mr_forest}.
+#' Includes an IVW estimate which is distinguished from all other variants
+#'
+#' @examples mr_loo(mr_input(bx = ldlc, bxse = ldlcse, by = chdlodds, byse = chdloddsse),
+#'   alpha = 0.01)
+#'
+#' @export
+
+setGeneric(name = "mr_loo",
+           def = function(object, alpha = 0.05){standardGeneric("mr_loo")})
 
 #--------------------------------------------------------------------------------------------
 
