@@ -24,8 +24,6 @@ setMethod("mr_forest",
               snps <- snps
             }
             
-            Interval_type <- paste(100*(1-alpha), "% CI)", sep = "")
-            Y_label <-  paste("Variant-specific causal estimate (", Interval_type, sep = "")
 
             if (snp_estimates) {
               #Calculate the estimates and CIs
@@ -55,13 +53,13 @@ setMethod("mr_forest",
               ivw_CI_lower = ivw_output$CILower
               ivw_CI_upper = ivw_output$CIUpper
               
-              ivw_row = data.frame("IVW Estimate", ivw_estimate, ivw_CI_lower, ivw_CI_upper)
+              ivw_row = data.frame("IVW estimate", ivw_estimate, ivw_CI_lower, ivw_CI_upper)
               names(ivw_row) = names(df)
               calculated = rbind(calculated, ivw_row)
             }
             #Median Method
             if ("median" %in% methods) {
-              median_output = mr_median(mr_input(Bx, Bxse, By, Byse), weighting="simple")
+              median_output = mr_median(mr_input(Bx, Bxse, By, Byse), weighting="simple", alpha= alpha)
               median_estimate = median_output$Estimate
               median_CI_lower = median_output$CILower
               median_CI_upper = median_output$CIUpper
@@ -71,7 +69,7 @@ setMethod("mr_forest",
               calculated = rbind(calculated, median_row)
             } 
             if("wmedian" %in% methods) {
-              wmedian_output = mr_median(mr_input(Bx, Bxse,Bby, Byse), weighting="weighted")
+              wmedian_output = mr_median(mr_input(Bx, Bxse,By, Byse), weighting="weighted", alpha = alpha)
               wmedian_estimate = wmedian_output$Estimate
               wmedian_CI_lower = wmedian_output$CILower
               wmedian_CI_upper = wmedian_output$CIUpper
@@ -81,7 +79,7 @@ setMethod("mr_forest",
               calculated = rbind(calculated, wmedian_row)
             } 
             if ("egger" %in% methods) {
-              egger_output = mr_egger(mr_input(Bx, Bxse, By, Byse))
+              egger_output = mr_egger(mr_input(Bx, Bxse, By, Byse), alpha = alpha)
               egger_estimate = egger_output$Estimate
               egger_CI_lower = egger_output$CILower.Est
               egger_CI_upper = egger_output$CIUpper.Est
@@ -91,7 +89,7 @@ setMethod("mr_forest",
               calculated = rbind(calculated, egger_row)
             } 
             if ("maxlik" %in% methods) {
-              maxlik_output = mr_maxlik(mr_input(Bx, Bxse, By, Byse))
+              maxlik_output = mr_maxlik(mr_input(Bx, Bxse, By, Byse), alpha = alpha)
               maxlik_estimate = maxlik_output$Estimate
               maxlik_CI_lower = maxlik_output$CILower
               maxlik_CI_upper = maxlik_output$CIUpper
@@ -101,7 +99,7 @@ setMethod("mr_forest",
               calculated = rbind(calculated, maxlik_row)
             } 
             if ("mbe" %in% methods) {
-              mbe_output = mr_mbe(mr_input(Bx, Bxse, By, Byse))
+              mbe_output = mr_mbe(mr_input(Bx, Bxse, By, Byse), alpha = alpha)
               mbe_estimate = mbe_output$Estimate
               mbe_CI_lower = mbe_output$CILower
               mbe_CI_upper = mbe_output$CIUpper
@@ -111,7 +109,7 @@ setMethod("mr_forest",
               calculated = rbind(calculated, mbe_row)
             } 
             if ("conmix" %in% methods) {
-              conmix_output = mr_conmix(mr_input(Bx, Bxse, By, Byse))
+              conmix_output = mr_conmix(mr_input(Bx, Bxse, By, Byse), alpha = alpha)
               conmix_estimate = conmix_output$Estimate
               conmix_CI_lower = conmix_output$CILower
               conmix_CI_upper = conmix_output$CIUpper
@@ -138,12 +136,22 @@ setMethod("mr_forest",
               df$snps = factor(df$snps, rev(df$snps))
             }
             
+            Interval_type <- paste(100*(1-alpha), "% CI)", sep = "")
+            Y_label <-  paste("Causal estimate (", Interval_type, sep = "")
+            
+            if (!snp_estimates) {
+              X_label <- "Methods"
+            } else {
+              X_label <- "Variants"
+            }
+            
+            
             forest <- ggplot(data = df, aes(y=snps, x=estimates, xmin=CI_lower, xmax = CI_upper)) +
               geom_point(shape = 15) +
               geom_point(data = calculated, aes(y=snps, x = estimates), shape = 18, size = 3) +
               geom_linerange() +
               geom_vline(xintercept = 0, lty= 2) +
-              ylab("Variants") + xlab(Y_label) +
+              ylab(X_label) + xlab(Y_label) +
               theme_classic()
             
             print(forest)

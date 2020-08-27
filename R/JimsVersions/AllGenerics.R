@@ -303,9 +303,9 @@ setGeneric(name = "mr_plot",
 #' 
 #'
 #' @param object An \code{MRInput} object.
-#' @param alpha Determines the size of the CI to be drawn
-#' @param snp_estimates Whether to plot the snp estimates
-#' @param methods Takes a string of computation methods used to calculate estimates.
+#' @param alpha Determines the size of the CI to be drawn. The default value is 0.05.
+#' @param snp_estimates Whether to plot the snp estimates. Defaults to TRUE.
+#' @param methods Takes a string of computation methods used to calculate estimates. Defaults to "ivw"
 #' @param ordered Determines by whether to order by the estimates. Defaults to FALSE
 #'
 #' @details As is produces as \code{ggplot} plot of forest plot.
@@ -313,6 +313,7 @@ setGeneric(name = "mr_plot",
 #'
 #' @examples mr_forest(mr_input(bx = ldlc, bxse = ldlcse, by = chdlodds, byse = chdloddsse),
 #'   alpha = 0.01, ordered = TRUE)
+#'   mr_forest(mr_input(bx = ldlc, bxse = ldlcse, by = chdlodds, byse = chdloddsse), methods = c("ivw", "wmedian", "egger), snp_estimates = FALSE)
 #'
 #' @export
 

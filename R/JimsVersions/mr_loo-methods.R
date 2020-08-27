@@ -35,7 +35,7 @@ setMethod("mr_loo",
             ivw_lower = ivw_output$CILower
             ivw_upper = ivw_output$CIUpper
             
-            ivw_row = data.frame("IVW Estimate", ivw_estimate, ivw_lower, ivw_upper)
+            ivw_row = data.frame("IVW estimate", ivw_estimate, ivw_lower, ivw_upper)
             names(ivw_row) = names(df)
             
             df = rbind(df, ivw_row)
