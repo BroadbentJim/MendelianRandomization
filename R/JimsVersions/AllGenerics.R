@@ -327,7 +327,7 @@ setGeneric(name = "mr_forest",
 #' 
 #'
 #' @param object An \code{MRInput} object.
-#' @param alpha Determines the size of the CI to be drawn
+#' @param alpha Determines the size of the CI to be drawn. Default value is 0.05.
 #'
 #' @details As is produces as \code{ggplot} plot of forest plot. The method looks at the estimate formed by excluding each variant and then plot as a forest plot akin to \code{mr_forest}.
 #' Includes an IVW estimate which is distinguished from all other variants
@@ -339,6 +339,25 @@ setGeneric(name = "mr_forest",
 
 setGeneric(name = "mr_loo",
            def = function(object, alpha = 0.05){standardGeneric("mr_loo")})
+
+#--------------------------------------------------------------------------------------------
+
+#' Draw a funnel plot of the genetic associations and/or causal estimates
+#'
+#' 
+#'
+#' @param object An \code{MRInput} object.
+#' @param CI A \code{logical} variable dicating as to whether to plot the CI associated with each point. Default value is TRUE
+#'
+#' @details As is produces as \code{ggplot} plot of funnel plot. 
+#'
+#' @examples mr_funnel(mr_input(bx = ldlc, bxse = ldlcse, by = chdlodds, byse = chdloddsse),
+#'   CI = FALSE)
+#'
+#' @export
+
+setGeneric(name = "mr_funnel",
+           def = function(object, CI = TRUE){standardGeneric("mr_funnel")})
 
 #--------------------------------------------------------------------------------------------
 
