@@ -17,7 +17,7 @@ setMethod("mr_funnel",
             df = data.frame(r, precision, CI_lower, CI_upper)
             X_label = "Causal estimate (95% CI)"
             Y_label = "Precision"
-            ivw_estimate = mr_ivw(mr_input(Bx, By, Bxse, Byse))$Estimate
+            ivw_estimate = mr_ivw(mr_input(Bx, Bxse, By, Byse))$Estimate
             
             if (CI) {
               funnel = ggplot(data= df, aes(x= r, y= precision, xmin=CI_lower, xmax=CI_upper)) +
